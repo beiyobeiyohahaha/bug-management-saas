@@ -1,29 +1,49 @@
-# PyCharm
+# ------------------------
+# PyCharm / JetBrains
+# ------------------------
 .idea/
 
-# macOS
+# ------------------------
+# macOS 系统文件
+# ------------------------
 .DS_Store
 
-# Python cache
+# ------------------------
+# Python 编译缓存
+# ------------------------
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environments
+# ------------------------
+# 虚拟环境目录
+# ------------------------
 venv/
 .env/
 *.venv/
+ENV/
 
-# Django specific
-local_settings.py
-db.sqlite3
+# ------------------------
+# Django 项目特定
+# ------------------------
+local_settings.py        # 本地配置
+db.sqlite3               # 本地数据库（不要上传）
+media/                   # 用户上传的文件（一般不用传）
+staticfiles/             # collectstatic 后生成的文件
 
-# Django migrations (ignore migration files but keep __init__.py)
+# ------------------------
+# Django 迁移文件
+# 忽略所有迁移文件，但保留 __init__.py
+# ------------------------
 */migrations/*.py
 !*/migrations/__init__.py
 
-# Logs
+# ------------------------
+# 日志文件
+# ------------------------
 *.log
 
-# Windows junk
+# ------------------------
+# Windows 系统文件
+# ------------------------
 Thumbs.db

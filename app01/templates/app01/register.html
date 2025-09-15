@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>注册</title>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    .wrap {max-width: 520px; margin: 40px auto;}
+    .title {text-align:center; margin: 10px 0 25px;}
+    .help {color:#d9534f; margin-top:5px;}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h3 class="title">注册</h3>
+
+  <form id="regForm">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>用户名</label>
+      {{ form.username }}
+      <div class="help" data-err="username"></div>
+    </div>
+    <div class="form-group">
+      <label>邮箱</label>
+      {{ form.email }}
+      <div class="help" data-err="email"></div>
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      {{ form.password }}
+      <div class="help" data-err="password"></div>
+    </div>
+    <div class="form-group">
+      <label>重复密码</label>
+      {{ form.confirm_password }}
+      <div class="help" data-err="confirm_password"></div>
+    </div>
+    <div class="form-group">
+      <label>手机号</label>
+      {{ form.mobile_phone }}
+      <div class="help" data-err="mobile_phone"></div>
+    </div>
+
+    <div class="form-group">
+      <label>验证码</label>
+      <div class="input-group">
+        {{ form.code }}
+        <span class="input-group-btn">
+          <button id="btnCode" class="btn btn-default" type="button">获取验证码</button>
+        </span>
+      </div>
+      <div class="help" data-err="code"></div>
+    </div>
+
+    <button id="btnSubmit" type="button" class="btn btn-primary">注册</button>
+    <span id="msg" style="margin-left:10px;"></span>
+  </form>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script>
+  // CSRF
+  function getCookie(name){
+    var value=null, cookies=document.cookie?document.cookie.split('; '):[];
+    for (var i=0;i<cookies.length;i++){
+      var parts=cookies[i].split('=');
+      var key=decodeURIComponent(parts.shift());
+      if (key===name){ value=decodeURIComponent(parts.join('=')); break; }
+    }
+    return value;
+  }
+  var csrftoken = getCookie('csrftoken');
+  $.ajaxSetup({
+    beforeSend:function(xhr, settings){
+      if(!(/^GET|HEAD|OPTIONS|TRACE$/i.test(settings.type))){
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      }
+    }
+  });
+
+  // 获取验证码
+  var wait = 60;
+  function countdown(btn){
+    if (wait === 0) {
+      btn.removeAttr("disabled").text("获取验证码");
+      wait = 60;
+    } else {
+      btn.attr("disabled", true).text(wait + "s");
+      wait--;
+      setTimeout(function(){ countdown(btn); }, 1000);
+    }
+  }
+
+  $("#btnCode").on("click", function(){
+    var phone = $("#id_mobile_phone").val();
+    if (!phone){ alert("请先输入手机号"); return; }
+
+    var $btn = $(this);
+    $.get("{% url 'app01:send_sms' %}", {phone: phone, tpl: "register"}, function(res){
+      if(res.status === "ok"){
+        $("#msg").text("验证码已发送（mock，code=" + res.code + "）");
+        countdown($btn);
+      }else{
+        $("#msg").text(res.msg || "发送失败").css("color","#d9534f");
+      }
+    });
+  });
+
+  // 提交注册
+  $("#btnSubmit").on("click", function(){
+    $(".help[data-err]").empty();  // 清空错误
+    $.post("{% url 'app01:register' %}", $("#regForm").serialize(), function(res){
+      if(res.status === "ok"){
+        $("#msg").text("注册成功").css("color","#5cb85c");
+      }else{
+        $("#msg").text("请检查输入").css("color","#d9534f");
+        // 展示后端 form 的错误
+        $.each(res.errors, function(name, msgs){
+          $("[data-err='"+name+"']").text(msgs[0]);
+        });
+      }
+    });
+  });
+</script>
+</body>
+</html>
