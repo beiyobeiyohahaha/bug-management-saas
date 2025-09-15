@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bug_platform.apps.BugPlatformConfig',
+    'app01.apps.BugPlatformConfig',
 ]
 
 MIDDLEWARE = [
@@ -55,8 +55,9 @@ ROOT_URLCONF = 'bug_platproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        #'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,10 +120,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-#自己的短信模板
-SMS = 0
+# settings.py
+
 
 STATIC_URL = '/static/'
+
+# 是否启用腾讯云短信
+USE_TENCENT_SMS = False   # 本地/测试时用 False，上线时改 True
+
+# 腾讯云配置（上线时才用到）
+TENCENT_SMS_APP_ID = "你的AppID"
+TENCENT_SMS_APP_KEY = "你的AppKey"
+TENCENT_SMS_SIGN = "你的短信签名"
+
+TENCENT_SMS_TEMPLATE = {
+    "login": 548762,
+    "register": 548760,
+}
 
 try:
     from .local_settings import *
